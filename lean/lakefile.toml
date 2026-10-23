@@ -1,0 +1,8 @@
+name = "rule30"
+defaultTargets = ["ConstColumn", "Reduction"]
+
+[[lean_lib]]
+name = "ConstColumn"
+
+[[lean_lib]]
+name = "Reduction"

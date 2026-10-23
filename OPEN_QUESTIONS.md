@@ -1,0 +1,12 @@
+# Open questions
+
+Pick any. Say so in an issue so we do not duplicate work.
+
+1. **Is this known?** Prior art on how long a finite Rule 30 seed can follow a prescribed center column past its radius. Related: Jen (1986/1990), Kopra, Condrey (arXiv:2609.09431), Rowland ("Local nested structure in rule 30", 2006). A pointer, even "this is trivially true because...", is valuable.
+2. **Independent replication.** Reimplement the gap computation from the README description (no peeking at `gapscan.c`) and compare with `results/gap_period2_exact.csv`. Disagreements are the most useful thing you can send.
+3. **Explain the slow growth.** Is `gap(w) <= C log2 w` provable? The cells just past the seed's edge take only a few dozen distinct patterns over all right halves; that structure is the likeliest handle. Rowland's period-doubling of Rule 30's edge diagonals may be relevant.
+4. **Prove it for one period above 1.** Even period 2 with a finite (non-uniform) gap for every width would be new (period 1 is a theorem here).
+5. **Other rules (partly answered).** I compared the 8 left-permutive rules with `f = l XOR g(c,r)` and `g(0,0)=0` (Wolfram codes 30, 60, 90, 120, 150, 180, 210, 240) at width 12, for eight target patterns. A small gap for a *non-constant* repeating target is generic: all eight rules, even the trivial pure shift (240), give gaps of only 1 to 10. What is special about Rule 30 is that even the *constant* targets (all 0, all 1) have a finite gap (Condrey's theorem); in the other rules some finite seed follows the all-zero pattern forever. So the slow growth is less specific to Rule 30 than it may look. Open: do the other rules' gaps also grow like log w? Is there a general theorem for left-permutive rules? Rules with `g(0,0)=1` (45, 135, ...) have no quiescent zero background and are not covered.
+6. **Larger scale.** Exhaustive enumeration to width 38 (period 2) and exact SAT to 56. Extending either, or checking larger periods, would show whether slow growth persists.
+7. **The backgrounds.** For alternating traces, the forced left half sometimes has a periodic tail, always one of a few Rule 30 backgrounds (ring sizes 7, 155, 728, with an 84-ring one that never occurs as a tail). Why exactly these? Each block size found is a power of 2 times `1 + r + r^2` (7, 31, 13, ...); is that a coincidence?
+8. **Lean.** State and prove any of the above, or give a cleaner formalization of the reduction.

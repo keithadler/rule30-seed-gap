@@ -1,0 +1,11 @@
+period 2, r=32: 128/128 chunks (100%), longest gap 9, seeds checked 8,589,934,592
+period 2, r=33: 256/256 chunks (100%), longest gap 9, seeds checked 17,179,869,184
+period 2, r=34: 256/256 chunks (100%), longest gap 8, seeds checked 34,359,738,368
+period 2, r=35: 512/512 chunks (100%), longest gap 8, seeds checked 68,719,476,736
+period 2, r=36: 1024/1024 chunks (100%), longest gap 9, seeds checked 137,438,953,472
+period 2, r=37: 2048/2048 chunks (100%), longest gap 9, seeds checked 274,877,906,944
+period 2, r=38: 4021/4096 chunks (98%), longest gap 10, seeds checked 539,689,484,288
+other targets (periods 3-10 + random), r=24: 17 patterns, largest gap 14 (pattern 0010101101)
+other targets (periods 3-10 + random), r=26: 37 patterns, largest gap 13 (pattern 010111)
+other targets (periods 3-10 + random), r=28: 37 patterns, largest gap 12 (pattern 0001)
+other targets (periods 3-10 + random), r=30: 23 patterns, largest gap 11 (pattern 011)
