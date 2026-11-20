@@ -46,7 +46,7 @@ The small gap for non-constant repeating patterns is **not special to Rule 30**:
 
 `src/gapscan.c` is a fast bitsliced search (64 right halves per machine word). `src/reference.py` is a deliberately simple pure-Python version that shares no code with it; the two agree on every small case I tried (for example longest gaps 7, 2, 7, 6, 5, 4 at widths 8, 10, 12 for the traces `01` and `10`).
 `src/gapscan_rules.c` is the same search for the other left-permutive rules (set the environment variable `RULEG` to the 4-bit table of `g(c,r)`; the default 14 is Rule 30).
-Lean: `cd lean && lake build` (Lean 4.35.0, core only, no Mathlib).
+Lean: `cd lean && lake build` (Lean 4.36.0, core only, no Mathlib).
 
 ## Help wanted
 
