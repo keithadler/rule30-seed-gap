@@ -1,2 +1,6 @@
 gapscan
 .lake/
+onesided
+rightlang
+.venv/
+__pycache__/

@@ -56,7 +56,11 @@ PYTHONPATH=src .venv/bin/python src/mint.py 2 8 19 29   # prints the horizon H(w
 
 `src/sat_period.py` encodes "some nonzero seed in `[-A, A]` has a center column with period `p` on times `t0 .. T`" as CNF, keeping only cells that can reach the center by time `T`. `src/mint.py` searches for the first `T` that is UNSAT. Run directly, `sat_period.py` also checks every SAT answer by simulating the seed it finds. On a laptop, `w = 29` takes about a second and `w = 45` about 20 seconds. The solver's UNSAT answers are not independently certified (no DRAT/LRAT proof is written).
 `src/gapscan_rules.c` is the `gapscan.c` search for the other left-permutive rules (set the environment variable `RULEG` to the 4-bit table of `g(c,r)`; the default 14 is Rule 30).
-Lean: `cd lean && lake build` (Lean 4.36.0, core only, no Mathlib).
+Lean: `cd lean && lake build` (Lean 4.36.0, core only, no Mathlib). This also builds `Period2.lean`.
+
+## Period 2: an attempt at a proof
+
+[PERIOD2_NOTES.md](PERIOD2_NOTES.md) records a failed attempt to prove the period-2 case, and what it found: the problem splits into a left side and a right side, the small gap comes from the right side, and an alternating center column sits inside a known Rule 30 background of spatial period 155. One small lemma from it is proved in `lean/Period2.lean`.
 
 ## Help wanted
 
