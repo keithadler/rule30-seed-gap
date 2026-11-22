@@ -1,6 +1,6 @@
 # Period 2: how an alternating center column works, and why I could not rule it out
 
-**Status: no proof.** This note records an attempt (Keith Adler, working with Claude, November 2026) to prove that no finite Rule 30 seed has a center column that alternates `0,1,0,1,...` forever. The attempt failed. What it found is a description of the mechanism and one small machine-checked lemma. Nothing here is a claim on Wolfram's prize, and I have not checked the literature for any of it beyond what `CREDITS.md` lists.
+**Status: no proof.** This note records an attempt (Keith Adler, working with Claude, November 2026) to prove that no finite Rule 30 seed has a center column that alternates `0,1,0,1,...` forever. The attempt failed. What it found is a description of the mechanism, a computer check with no counterexample (end of section 5), and two machine-checked lemmas (sections 1 and 6a). Nothing here is a claim on Wolfram's prize, and I have not checked the literature for any of it beyond what `CREDITS.md` lists.
 
 Throughout, the center column is `c(t) = t mod 2` (the other phase behaves the same way), `y(t)` is column 1, and `e(s) = y(2s)` is column 1 at even times.
 
@@ -123,7 +123,7 @@ So no seed with right width at most 16 and left width at most 9,986 has an alter
 
 ## 6. Why this did not become a proof
 
-* A finite seed cannot stay in the pure background: Jen's theorem (see `CREDITS.md`) allows at most one eventually periodic column, and here column 1 would be a second. So the 3s must keep arriving. That is the only thing proved about them.
+* A finite seed cannot stay in the pure background: `e` cannot become periodic (section 6a, proved in Lean; it also follows from the theorems of Jen and Kopra in `CREDITS.md`). So the 3s must keep arriving. That is the only thing proved about them.
 * Each 3 changes the required left half everywhere deeper than it can reach. The left half a seed needs is therefore a chaotic function of when the 3s arrive, and those times are produced by the chaotic part of the pattern.
 * A proof along this line has to show that those arrival times never keep matching a finite left half. I found nothing that controls them. It is the same kind of statement as Problem 1 itself.
 
@@ -141,7 +141,7 @@ Added later the same day, from a direct attack on the gap described under Kopra'
 
 **Proof.** The cell at depth `k` at time 0 depends only on `e(0), ..., e(floor((k-1)/2))` (the sideways formulas of section 1). So the left halves at times `2i` and `2*i2` agree at depths 1 to `2m`. At time `2i` the left half is zero beyond depth `w + 2i`. At time `2*i2` it has a one at depth `w + 2*i2`, because the left edge moves one cell per step, and that is deeper than `w + 2i`. If `2m >= w + 2*i2`, that one would have to be a zero.
 
-* It follows that `e` is not eventually periodic. For this case that is an elementary proof of what section 6 took from Jen's theorem.
+* It follows that `e` is not eventually periodic, which is the fact section 6 uses.
 * A block of `e` that repeats with period `j` from position `i` is shorter than `i + 2j + w/2`.
 * Checked on every seed in `[-7, 7]` inside its surviving window (`src/p2/repeat_check.py 7`): 1,616 repeating pairs, no violation.
 * **Proved in Lean** (`lean/Repeat.lean`, core only, axioms: `propext`, `Quot.sound`): `repeat_bound_alt` is the lemma as stated here. It rests on `repeat_bound`, which holds for any Rule 30 evolution, with no assumption on the center column: if columns 0 and -1 read the same for `n` steps from time `a` as from a later time `b`, then `n < W + b`, where `-W` is the seed's leftmost one. `left_det` is the step that two columns over `n` steps fix the row to depth `n` on the left.

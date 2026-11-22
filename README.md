@@ -26,7 +26,7 @@ For other repeating patterns (all primitive patterns of period 3 to 6 at widths 
 
 ![gap chart](results/gap_chart.png)
 
-The chart has not been redrawn: it stops at width 56 and still shows the `2 * log2(w)` line from the second version of this note. The table and the CSV are current.
+The chart is drawn from the CSV by `src/plot_gap.py` (needs matplotlib).
 
 **Correction history.** The first version of this note said the gap "stays flat". A second version said it grows "roughly like `2 * log2(w)`", using the widths 8, 16 and 32 and leaving out the rows for widths 17 to 28, where the gap reaches 17. The table above shows every range, and the full table is in the CSV.
 
@@ -65,7 +65,7 @@ Lean: `cd lean && lake build` (Lean 4.36.0, core only, no Mathlib). This also bu
 
 ## Period 2: an attempt at a proof
 
-[PERIOD2_NOTES.md](PERIOD2_NOTES.md) records a failed attempt to prove the period-2 case, and what it found: the problem splits into a left side and a right side, the small gap comes from the right side, and an alternating center column sits inside a known Rule 30 background of spatial period 155. Two lemmas from it are proved in Lean: a forced cell (`lean/Period2.lean`) and a bound on how early the column next to the center can repeat (`lean/Repeat.lean`).
+[PERIOD2_NOTES.md](PERIOD2_NOTES.md) records a failed attempt to prove the period-2 case, and what it found: the problem splits into a left side and a right side, the small gap comes from the right side, and an alternating center column sits inside a known Rule 30 background of spatial period 155. It also records a computer check that found no counterexample among seeds with right width up to 16 and left width up to 9,986. Two lemmas from it are proved in Lean: a forced cell (`lean/Period2.lean`) and a bound on how early the column next to the center can repeat (`lean/Repeat.lean`).
 
 ## Help wanted
 
