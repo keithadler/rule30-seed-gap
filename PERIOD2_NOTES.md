@@ -121,6 +121,27 @@ For a fixed right half the left half is forced, and it can be computed column by
 
 So no seed with right width at most 16 and left width at most 9,986 has an alternating center column forever. This is a bound from computation, not a proof. Outputs are in `results/p2/mega_*.txt`.
 
+### Left width and right width separately
+
+The README's table uses one width `w` for both sides. The forced-left method gives the horizon for each pair directly (`src/p2/grid.py`): a seed that keeps the forced cells to depth `a` and is zero beyond goes wrong exactly at the depth of the next forced one, because a change on the left moves right one cell per step. So `H(a, r)` is the largest such depth over all right halves of width at most `r`. Computed for `a <= 150`, `r <= 20` (`results/p2/grid_r20_a150.txt`); its diagonal reproduces the README's table exactly for `w = 2` to `12`.
+
+Gap `H(a, r) - a`:
+
+| right width r | a=8 | a=16 | a=19 | a=32 | a=64 | a=96 | a=128 | a=150 | mean for a = 50 to 150 |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | 1 | 6 | 3 | 4 | 4 | 2 | 3 | 2 | 2.2 |
+| 4 | 2 | 6 | 6 | 9 | 4 | 5 | 6 | 5 | 5.2 |
+| 8 | 7 | 8 | 17 | 9 | 7 | 9 | 10 | 10 | 8.4 |
+| 12 | 9 | 10 | 17 | 9 | 11 | 10 | 11 | 13 | 11.2 |
+| 16 | 9 | 10 | 17 | 9 | 12 | 15 | 17 | 13 | 12.8 |
+| 20 | 9 | 10 | 17 | 9 | 12 | 15 | 17 | 15 | 14.0 |
+
+* **The gap is set by the smaller of the two widths.** For a fixed right width it does not grow with the left width: at `r = 8` the mean gap is 8.8, 8.2 and 8.6 for `a` in 20 to 49, 50 to 99 and 100 to 150. For a fixed left width it stops changing once `r` passes `a` (cells further right cannot reach the center in time). So a seed that is wide on one side only does no better than a narrow one.
+* **It grows slowly with that smaller width.** The mean gap for `a` in 50 to 150 rises from 2.2 at `r = 0` to 14.0 at `r = 20`, by about 0.7 per cell at first and about 0.2 per cell by `r = 20`.
+* **The README's peak comes from a narrow right half.** The gap of 17 at `w = 19` is already reached with right width 6, and the gap at `w = 8` with right width 6 as well.
+
+This agrees with section 2: the left side alone puts no limit on the gap, and the right side supplies few candidates. It is a measurement, not a proof.
+
 ## 6. Why this did not become a proof
 
 * A finite seed cannot stay in the pure background: `e` cannot become periodic (section 6a, proved in Lean; it also follows from the theorems of Jen and Kopra in `CREDITS.md`). So the 3s must keep arriving. That is the only thing proved about them.
@@ -196,6 +217,10 @@ cd src/p2 && python3 megacheck.py 0 100000                      # right half as 
 
 ```bash
 cd src/p2 && python3 megabatch.py 10 2000 3                     # right width, depth, processes: every right half up to that width
+```
+
+```bash
+cd src/p2 && python3 grid.py 16 150 4                           # right width, left width, processes: the horizon for every pair (r = 20 takes about a minute more)
 ```
 
 ```bash
