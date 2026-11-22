@@ -62,6 +62,47 @@ Simulate the right half-plane for a long time with column 0 held at `0,1,0,1,...
 * **Usually the gaps settle to 5s with isolated 3s.** This held for 40 random right halves over 900 double steps, and for finite right halves of width 0, 1, 20 and 40 over 2,500 double steps. After the start-up, between two 3s there were always at least three 5s; three was by far the commonest, and up to 31 were seen. The 3s arrive at irregular times and showed no sign of stopping.
 * **There is at least one other stable behaviour.** Nine of the 255 nonzero right halves of width 8 (for example a single 1 at cell 6) give gap 2 forever, that is `e = 1,0,1,0,...`, for the 600 double steps tested.
 
+### The orderly part on the right is a strip four cells wide
+
+Added later the same day (`src/p2/layer.py`: 31 right halves, 20,000 steps each, events after step 600, 64,388 gaps, all of them 3 or 5).
+
+* **There is no deep regular background on the right.** Rows stop repeating with period 10 somewhere between cell 1 and cell 20 (mean 7.6). The 155 background of section 5 is on the left only, where it is forced.
+* **Cells 1 to 4 are locked.** At every even time when column 1 is 1, cells 1 to 4 read `1110`.
+* **Cell 5 decides the next gap.** If cell 5 is 1 at that time the next gap is 3; if it is 0 the next gap is 5. There was no exception in 64,388 gaps.
+* **Rows beside the center are restricted much deeper.** The number of distinct patterns of cells 1 to `k` at those times, for `k = 2 .. 25`:
+  1, 1, 1, 2, 2, 3, 3, 5, 8, 13, 18, 30, 48, 79, 119, 185, 282, 428, 624, 927, 1372, 1982, 2826, 4037, out of `2^(k-1)` possible. That is a factor of about 1.45 per cell.
+  These are the patterns the runs **visited**, not all the patterns that are possible; see the next heading.
+* **The visited counts creep up with more data** (`src/p2/satur.py`, gap-2 runs left out). With 35,239, 147,028 and 595,053 events the counts were 3, 3, 4 at `k = 8`; 18, 18, 21 at `k = 12`; 116, 119, 122 at `k = 16`; 604, 668, 709 at `k = 20`. Cells 1 to 5 took two patterns throughout.
+
+So the 3s are not signals moving through a background. The sequence of 3s and 5s is cell 5 read at certain times, and cell 5 is at the edge of the chaotic part.
+
+### Which rows are possible, as opposed to visited
+
+I had guessed the restriction could be proved from one remark: `x_{t+1}(1) = x_t(0) XOR (x_t(1) OR x_t(2))`, so wherever column 1 is 0 the cell in column 2 is forced. **That does not give the visited counts.** The exact number of possible rows is much larger.
+
+`src/p2/rowlang_sat.py` counts, with one SAT call per prefix, the words `w` of length `k` (first cell 1) for which some right half at time 0 gives `w` in cells 1 to `k` at time `T`, with column 0 alternating throughout:
+
+| look-back T | k=4 | k=6 | k=8 | k=10 | k=12 | k=14 |
+|---|---|---|---|---|---|---|
+| 6 | 4 | 10 | 29 | 90 | 288 | 921 |
+| 12 | 4 | 10 | 28 | 83 | 241 | 709 |
+| 24 | 4 | 10 | 26 | 74 | 195 | 541 |
+| 48 | 4 | 9 | 23 | 63 | 165 | 450 |
+| 96 | 4 | 7 | 21 | 55 | 135 | not run |
+| visited (595,053 events) | 1 | 2 | 4 | 9 | 21 | 51 |
+| all words with first cell 1 | 8 | 32 | 128 | 512 | 2,048 | 8,192 |
+
+* The possible set is a real restriction (450 of 8,192 at `k = 14`, `T = 48`) and it shrinks as `T` grows, slowly: at `k = 12` it goes 288, 241, 195, 165, 135 as `T` doubles from 6 to 96.
+* At `T = 48` it is still about nine times the visited set at `k = 14`, and cells 1 to 4 can still take four patterns, not one.
+* So either the possible set keeps shrinking toward the visited one at look-backs far beyond 96, or the visited rows are only the typical ones and rarer rows stay possible forever. The creep in the visited counts points to the second. **This is not decided.**
+* `src/p2/rowbound.py` gives the same kind of count without SAT, from an automaton that reads the row left to right and keeps only the last `tau` steps. It is an upper bound on the possible set and agrees with the SAT counts where they overlap (for `tau = T = 6` it gives 92 and 290 at `k = 10, 12` against 90 and 288).
+
+What is established is therefore weaker than I first said: the rows beside an alternating column are restricted, by an amount that can be computed exactly for any fixed look-back, and the runs visit far fewer rows than that. The rate of 1.45 per cell is a measurement of visited rows, not a bound.
+
+### The right side does not forget its starting cells
+
+`src/p2/merge.py` compares column 1 for a given right half with column 1 for the empty right half. For 65 right halves (widths 1 to 40) over 6,000 steps, none merged: column 1 still differed in the last 20 steps in every case, at 2,031 to 3,675 of the 6,000 steps. So the question does not reduce to one fixed sequence.
+
 ## 5. What that forces on the left
 
 `src/p2/forced.py` computes the unique left half that keeps the center alternating for a given `e`.
@@ -81,6 +122,25 @@ Other routes tried, each stopped for a stated reason:
 * **Left diagonals.** For any finite seed each diagonal parallel to the left edge is eventually periodic with period a power of 2 (from `D_d(t+1) = D_{d-2}(t) XOR (D_{d-1}(t) OR D_d(t))`). But column -1 meets each diagonal once, at the diagonal's first cell.
 * **Right diagonals.** They are exactly periodic (`G_d(t+1) = G_d(t) XOR (G_{d-1}(t) OR G_{d-2}(t))`), which forces `x_{t-mP}(-mP) = c(t)` when `P` is the period of the diagonal through the center at time `t`. A contradiction would need `P < (t - A)/2`, and the periods grow much faster than that.
 
+## 6a. One thing that can be proved: e cannot repeat early
+
+Added later the same day, from a direct attack on the gap described under Kopra's theorem below.
+
+**Lemma.** Let the seed's leftmost one be at `-w`, and let `e` be as above. For all `0 <= i < i2`: if `e[i .. i+m) = e[i2 .. i2+m)` then `2m < w + 2*i2`.
+
+**Proof.** The cell at depth `k` at time 0 depends only on `e(0), ..., e(floor((k-1)/2))` (the sideways formulas of section 1). So the left halves at times `2i` and `2*i2` agree at depths 1 to `2m`. At time `2i` the left half is zero beyond depth `w + 2i`. At time `2*i2` it has a one at depth `w + 2*i2`, because the left edge moves one cell per step, and that is deeper than `w + 2i`. If `2m >= w + 2*i2`, that one would have to be a zero.
+
+* It follows that `e` is not eventually periodic. For this case that is an elementary proof of what section 6 took from Jen's theorem.
+* A block of `e` that repeats with period `j` from position `i` is shorter than `i + 2j + w/2`.
+* Checked on every seed in `[-7, 7]` inside its surviving window (`src/p2/repeat_check.py 7`): 1,616 repeating pairs, no violation.
+* **Proved in Lean** (`lean/Repeat.lean`, core only, axioms: `propext`, `Quot.sound`): `repeat_bound_alt` is the lemma as stated here. It rests on `repeat_bound`, which holds for any Rule 30 evolution, with no assumption on the center column: if columns 0 and -1 read the same for `n` steps from time `a` as from a later time `b`, then `n < W + b`, where `-W` is the seed's leftmost one. `left_det` is the step that two columns over `n` steps fix the row to depth `n` on the left.
+* **Two corollaries, also in `lean/Repeat.lean`.** `two_columns_never_periodic`: for any finite nonzero row, columns 0 and -1 are never both eventually periodic with a common period. For Rule 30 this is the two-adjacent-columns theorem of Jen and Kopra; `seed0_two_columns` states it for the single-cell pattern. `alt_e_never_periodic`: if the center column alternates forever, column -1 read at even times is not eventually periodic. So section 6 no longer needs to cite Jen for that step.
+* Because `e` usually starts with a long stretch of gaps 2, 5, 2, 5, ..., the lemma gives a lower bound on the left width for 887 of the 1,024 right halves of width up to 10, above 100 for 247 of them and up to 532 (`src/p2/repeat.py 10 300`).
+
+**Why it does not finish the job.** The proof uses one known one in the later left half, the edge at depth `w + 2*i2`. That depth grows with `i2`, so the lemma says nothing about repetitions late in the run. Closing the gap would need a one within a bounded distance beyond depth `w + 2i`, that is, a bound on zero runs inside the pattern, and nothing bounds those.
+
+I also looked for cells of the forced left half-plane that are a single bit of `e` (`src/p2/cells.py`). They exist only in columns -1 to -6; from column -7 to column -30 there are none, with or without restricting `e` to what the right side can produce.
+
 ## Prior work on this case
 
 Read for this note: the HTML version of Condrey's paper and the arXiv preprint 2202.13809 of Kopra (see `CREDITS.md`). I did not read the journal version of Kopra's paper or Jen's papers.
@@ -93,7 +153,7 @@ Read for this note: the HTML version of Condrey's paper and the arXiv preprint 2
 ## 7. What might be worth doing with this
 
 * **Describe the right-side language exactly.** Is "5s with isolated 3s, at least three 5s between" the whole long-run language apart from the gap-2 behaviour? Is its growth exponential or slower?
-* **Explain the regularity.** Why does the right half-plane settle next to an alternating column, when Rule 30 is chaotic elsewhere?
+* **Decide possible against visited.** Section 4 found that the runs visit far fewer rows than are possible at look-back 96. Does the possible set shrink to the visited one as the look-back grows, or do the rare rows stay possible? If cells 1 to 4 are ever forced to `1110`, at what look-back?
 * **Check a prediction.** If the long-run language has positive but small entropy, the gap in the README's table should grow linearly with a small slope rather than logarithmically. Widths to 56 cannot tell these apart.
 * **Check whether any of this is known.** I have not searched for it.
 
@@ -120,5 +180,33 @@ cd src/p2 && ../../.venv/bin/python rightsim.py 1 900 40       # seed, double st
 ```
 
 ```bash
-cd lean && lake build Period2                                  # Lean 4.36.0, core only
+cd src/p2 && python3 layer.py 20000                              # steps: the strip beside the center and the row counts
+```
+
+```bash
+cd src/p2 && ../../.venv/bin/python rowlang_sat.py 48 14           # look-back, longest word: exact count of possible rows
+```
+
+```bash
+cd src/p2 && python3 rowbound.py 6 22                            # look-back, longest word: automaton upper bound
+```
+
+```bash
+cd src/p2 && python3 satur.py 10000 640                          # steps, right halves: visited counts at three data sizes
+```
+
+```bash
+cd src/p2 && python3 merge.py 6000 60                            # steps, random right halves: merging test against the empty right half
+```
+
+```bash
+cd src/p2 && python3 repeat_check.py 7 && python3 repeat.py 10 300   # the repetition lemma: check on all small seeds, and its strength
+```
+
+```bash
+cd src/p2 && python3 cells.py 16 30 8                            # word length, columns, times: which left cells are single bits of e
+```
+
+```bash
+cd lean && lake build Period2 Repeat                           # Lean 4.36.0, core only
 ```

@@ -1,5 +1,5 @@
 name = "rule30"
-defaultTargets = ["ConstColumn", "Reduction", "Period2"]
+defaultTargets = ["ConstColumn", "Reduction", "Period2", "Repeat"]
 
 [[lean_lib]]
 name = "ConstColumn"
@@ -9,3 +9,6 @@ name = "Reduction"
 
 [[lean_lib]]
 name = "Period2"
+
+[[lean_lib]]
+name = "Repeat"
