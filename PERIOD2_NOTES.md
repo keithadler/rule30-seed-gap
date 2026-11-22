@@ -1,6 +1,6 @@
 # Period 2: how an alternating center column works, and why I could not rule it out
 
-**Status: no proof.** This note records an attempt (Keith Adler, working with Claude, November 2026) to prove that no finite Rule 30 seed has a center column that alternates `0,1,0,1,...` forever. The attempt failed. What it found is a description of the mechanism, a computer check with no counterexample (end of section 5), and two machine-checked lemmas (sections 1 and 6a). Nothing here is a claim on Wolfram's prize, and I have not checked the literature for any of it beyond what `CREDITS.md` lists.
+**Status: no proof.** This note records an attempt (Keith Adler, working with Claude, November 2026) to prove that no finite Rule 30 seed has a center column that alternates `0,1,0,1,...` forever. The attempt failed. What it found is a description of the mechanism, a computer check with no counterexample (end of section 5), and three machine-checked results (sections 1, 4 and 6a). Nothing here is a claim on Wolfram's prize, and I have not checked the literature for any of it beyond what `CREDITS.md` lists.
 
 Throughout, the center column is `c(t) = t mod 2` (the other phase behaves the same way), `y(t)` is column 1, and `e(s) = y(2s)` is column 1 at even times.
 
@@ -54,13 +54,27 @@ Which words `e` can some right half produce? (`src/p2/rightlang.c` by brute forc
 * Zeros come in runs of at most 4.
 * There is no short list of forbidden patterns: 237 minimal forbidden words up to length 30 (`11`, `00000`, `101001`, `0100101`, `010010001`, ...), with new ones at every length from 9 on.
 * The full list of length-30 words is in `results/p2/words30_ph0.txt`.
+* A later run to length 48 (`results/p2/counts48_ph0.txt`) gives 32,656 words at `n = 48`; the growth ratio there is 1.110 and still falling slowly.
 
 ## 4. In the long run the right side does something very regular
 
 Simulate the right half-plane for a long time with column 0 held at `0,1,0,1,...` (`src/p2/rightsim.py`) and write `e` as the gaps between its ones.
 
-* **Usually the gaps settle to 5s with isolated 3s.** This held for 40 random right halves over 900 double steps, and for finite right halves of width 0, 1, 20 and 40 over 2,500 double steps. After the start-up, between two 3s there were always at least three 5s; three was by far the commonest, and up to 31 were seen. The 3s arrive at irregular times and showed no sign of stopping.
+* **Usually the gaps settle to 5s with isolated 3s.** This held for 40 random right halves over 900 double steps, and for finite right halves of width 0, 1, 20 and 40 over 2,500 double steps. After the start-up, two 3s are usually separated by three or more 5s (three is by far the commonest, and up to 31 were seen), but a single 5 between two 3s also occurs: for the empty right half the gaps 3, 5, 3 first appear at position 1,580 of `e`. (An earlier version of this note said "always at least three 5s"; that was wrong.) The 3s arrive at irregular times and showed no sign of stopping.
 * **There is at least one other stable behaviour.** Nine of the 255 nonzero right halves of width 8 (for example a single 1 at cell 6) give gap 2 forever, that is `e = 1,0,1,0,...`, for the 600 double steps tested.
+
+### Walls: right halves that are ruled out for every left half (proved in Lean)
+
+The gap-2 behaviour above can be made exact, and then it excludes seeds outright.
+
+* Watch cells 1 to `k` with column 0 alternating. A **wall** is a finite set of states (center value, cells 1 to `k`) that is closed under one Rule 30 step for *both* values of cell `k + 1`, and in which cell 1 depends only on a phase that advances by one each step. Once the cells are in a wall, column 1 is periodic forever, whatever lies further right.
+* A periodic column 1 makes column -1 periodic at even times, which section 6a forbids for any row with a leftmost one. So **no seed with an alternating center column can ever have its cells 1 to `k` in a wall**, at any time, for any left half.
+* `lean/Wall.lean` proves this (`wall_excluded`) and checks four walls by `decide`: three with column 1 = `1,1,0,0` repeating (109 states each, `k` = 19, 26, 33) and one with a period of 14 steps (225 states, `k` = 31, gaps of `e` alternating 2 and 5). The data are in `lean/WallData.lean`, written by `src/p2/mkwalls.py` from `results/p2/walls/`; Lean re-checks all of it. Axioms: `propext`, `Classical.choice`, `Quot.sound`.
+* Example (`wallT2_example`): a row with a leftmost one whose cells 1 to 19 read `1001100101011000000` does not have the center column `0,1,0,1,...` forever. The other cells are arbitrary.
+* How common: of the 262,144 right halves of width at most 17 (both phases), 9,367 reach one of these walls; all the others reach a second kind of closed set, described next but not formalised.
+* **A trap, not yet in Lean.** There is a set of 1,518 states of cells 1 to 16, closed in the same sense, inside which the gaps of `e` are only 3 and 5 and cells 1 to 4 read `1110` whenever cell 1 is 1 at an even time. It does not make `e` periodic, so it excludes nothing by itself. Every right half tried ends in this trap or in a wall (all of width at most 17; 5,500 random ones of width 40, 100 and 300), but that is a measurement: a right half whose far cells are chosen adversarially can avoid both forever with a non-periodic `e`, so no finite check of this kind can prove it.
+
+The walls and the trap were found by Claude subagents running closure searches, and re-derived by separate referee runs before being formalised.
 
 ### The orderly part on the right is a strip four cells wide
 
@@ -142,6 +156,29 @@ Gap `H(a, r) - a`:
 
 This agrees with section 2: the left side alone puts no limit on the gap, and the right side supplies few candidates. It is a measurement, not a proof.
 
+### A counting law for the gap
+
+The last sentence can be made into a prediction with no fitted number (`src/p2/gaplaw.py`, `src/p2/gaplaw2.py`).
+
+* The left half of a seed of width `w` is fixed by the first `w/2` or so values of `e` (section 1). After time `w`, each further step the seed survives is one yes/no coincidence: at an odd time column -1 must be 1, at an even time it must be the opposite of `e`.
+* **Assume** those coincidences behave like fair coin flips. Then the expected number of candidates still alive at time `T` is `N_w(T/2) * 2^-(T-w)`, where `N_w(n)` is the number of words `e` of length `n` that right halves of width at most `w` can produce, both phases added. The predicted horizon is the first `T` where this falls below 1.
+* `N_w(n)` counted exactly by SAT (`src/p2/rightlang_w.py`, outputs in `results/p2/gaplaw/`):
+
+| width w | words at the longest length counted (phase 0 + phase 1) | predicted gap | measured gap |
+|---|---|---|---|
+| 30 | 1,054 + 976 at `n = 22` | 11 | 9 |
+| 38 | 2,111 + 1,947 at `n = 26` | 12 | 10 |
+| 46 | 3,908 + 3,578 at `n = 30` | 13 | 11 |
+| 54 | 6,664 + 6,054 at `n = 34` | 14 | 12 |
+
+* The prediction is 2 too high each time, with the same slope. A cruder version over every width from 29 to 82 (the unrestricted phase-0 count, doubled) is between 0 and 5 too high, 3.1 on average.
+* The phase-0 counts for limited width equal the unrestricted counts of section 3 at every length, so at these sizes a narrow right half already produces every word.
+* So the gap is roughly `log2` of the number of words the right side can make, minus 2. It is small because that number is small (it grows by about 1.10 per symbol, where free sequences would grow by 1.62 or 2).
+* If the word count keeps growing exponentially, the gap grows **linearly** in `w`, by about 0.07 per unit of width: about 16 at `w = 100` and 24 at `w = 200`. These are upper guesses, because the growth ratio is still falling. A logarithmic law is not what this predicts.
+* The law does not explain the gap of 17 at `w = 19` (it predicts 9).
+
+**This is a heuristic, not a proof.** "The coincidences behave like coin flips" is the whole unproved content of the period-2 problem; the law only shows that the measured gaps are what that assumption predicts.
+
 ## 6. Why this did not become a proof
 
 * A finite seed cannot stay in the pure background: `e` cannot become periodic (section 6a, proved in Lean; it also follows from the theorems of Jen and Kopra in `CREDITS.md`). So the 3s must keep arriving. That is the only thing proved about them.
@@ -184,9 +221,9 @@ Read for this note: the HTML version of Condrey's paper and the arXiv preprint 2
 
 ## 7. What might be worth doing with this
 
-* **Describe the right-side language exactly.** Is "5s with isolated 3s, at least three 5s between" the whole long-run language apart from the gap-2 behaviour? Is its growth exponential or slower?
+* **Describe the right-side language exactly.** What is the whole long-run language of 3s and 5s, apart from the gap-2 behaviour? Is its growth exponential or slower?
 * **Decide possible against visited.** Section 4 found that the runs visit far fewer rows than are possible at look-back 96. Does the possible set shrink to the visited one as the look-back grows, or do the rare rows stay possible? If cells 1 to 4 are ever forced to `1110`, at what look-back?
-* **Check a prediction.** If the long-run language has positive but small entropy, the gap in the README's table should grow linearly with a small slope rather than logarithmically. Widths to 82 cannot tell these apart (the gap is 10 to 15 from width 57 to 82).
+* **Check a prediction.** The counting law of section 5 says the gap should grow linearly with a small slope (about 0.07 per unit of width) rather than logarithmically, if the right-side word count keeps growing exponentially. Widths to 82 cannot tell these apart (the gap is 10 to 15 from width 57 to 82); exact horizons near width 150 or 200 could.
 * **Check whether any of this is known.** I have not searched for it.
 
 ## Reproduce
@@ -209,6 +246,14 @@ python3 -m venv .venv && .venv/bin/pip install python-sat numpy
 
 ```bash
 cd src/p2 && ../../.venv/bin/python rightsim.py 1 900 40       # seed, double steps, runs: gap sequences from random right halves
+```
+
+```bash
+cd src/p2 && python3 gaplaw.py && python3 gaplaw2.py              # the counting law against the measured gaps (reads results/)
+```
+
+```bash
+cd src/p2 && ../../.venv/bin/python rightlang_w.py 22 0 30     # length, phase, width: word counts for right halves of width <= 30
 ```
 
 ```bash
