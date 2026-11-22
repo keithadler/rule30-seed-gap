@@ -81,6 +81,15 @@ Other routes tried, each stopped for a stated reason:
 * **Left diagonals.** For any finite seed each diagonal parallel to the left edge is eventually periodic with period a power of 2 (from `D_d(t+1) = D_{d-2}(t) XOR (D_{d-1}(t) OR D_d(t))`). But column -1 meets each diagonal once, at the diagonal's first cell.
 * **Right diagonals.** They are exactly periodic (`G_d(t+1) = G_d(t) XOR (G_{d-1}(t) OR G_{d-2}(t))`), which forces `x_{t-mP}(-mP) = c(t)` when `P` is the period of the diagonal through the center at time `t`. A contradiction would need `P < (t - A)/2`, and the periods grow much faster than that.
 
+## Prior work on this case
+
+Read for this note: the HTML version of Condrey's paper and the arXiv preprint 2202.13809 of Kopra (see `CREDITS.md`). I did not read the journal version of Kopra's paper or Jen's papers.
+
+* **Condrey states this case as open**: the next unresolved case is eventual period two, and the paper makes no claim about it. Its acknowledgments credit Jarkko Kari with suggesting the exclusion of nonconstant periodic traces as the next step. Its period-1 proof rests on a left half that is the same at every step (an alternating tail), and it gives no such object for period 2. It proves only the lower bound `H(2,w) >= w`.
+* **Condrey's `H(p,w)` is for eventually periodic traces.** Everything in this note and in the README's table requires the alternation from time 0, so the numbers here are lower bounds for his quantity, not the same thing.
+* **Kopra's theorem needs two full adjacent columns.** If two adjacent columns are eventually periodic, left permutivity makes every column to their left eventually periodic, which contradicts the left edge moving at speed 1. An alternating center column gives one full column and half of the next (column -1 at odd times, section 1). The missing half is `e`, and the argument does not go through without it. Kopra's preprint also notes that the class of rules his method covers contains Rule 90, where a single column can be periodic, so any single-column result needs something specific to Rule 30.
+* I found nothing in either paper about the 155 background, the right-side language, or the split in section 1. I have not searched further.
+
 ## 7. What might be worth doing with this
 
 * **Describe the right-side language exactly.** Is "5s with isolated 3s, at least three 5s between" the whole long-run language apart from the gap-2 behaviour? Is its growth exponential or slower?
