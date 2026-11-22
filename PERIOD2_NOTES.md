@@ -110,6 +110,17 @@ What is established is therefore weaker than I first said: the rows beside an al
 * **`e` = all gaps 5** forces a left half that is spatially periodic with period **155**, with zero runs of at most 6. This is one of the Rule 30 backgrounds with an alternating site (item 7 of `OPEN_QUESTIONS.md`). So an alternating center column is a column inside that background.
 * **One 3 among the 5s** (after eight 5s): the forced left half follows the 155 background up to depth 86, departs at depth 87, and shows no period up to 200 in the next 699 cells.
 
+### Checking small right halves against deep left halves
+
+For a fixed right half the left half is forced, and it can be computed column by column with big integers (`src/p2/megacheck.py`). So a search for a counterexample costs `2^(right width)`, not `2^(left + right)`: a seed with a given right half exists only if its forced left half is zero beyond some depth.
+
+* **Empty right half, depth 1,000,000, both phases**: the last one is at depth 999,999. The longest zero run is 22 (phase 0, after depth 564,972) and 20 (phase 1).
+* **Every right half of width up to 16** (65,536, both phases), **depth 10,000** (`src/p2/megabatch.py`): the smallest depth of the last one is 9,986. The longest zero run is 27, after depth 8,300.
+* The number of zero runs halves with each extra cell of length (about 650 million runs counted), and the longest run starting at a depth of 1, 2, 3, 4 digits is 8, 17, 25, 27. Halving at each step is what coin flips would give.
+* Checked against the slower method of this section on 30 random right halves, and against the README's table for widths 2 to 12.
+
+So no seed with right width at most 16 and left width at most 9,986 has an alternating center column forever. This is a bound from computation, not a proof. Outputs are in `results/p2/mega_*.txt`.
+
 ## 6. Why this did not become a proof
 
 * A finite seed cannot stay in the pure background: Jen's theorem (see `CREDITS.md`) allows at most one eventually periodic column, and here column 1 would be a second. So the 3s must keep arriving. That is the only thing proved about them.
@@ -154,7 +165,7 @@ Read for this note: the HTML version of Condrey's paper and the arXiv preprint 2
 
 * **Describe the right-side language exactly.** Is "5s with isolated 3s, at least three 5s between" the whole long-run language apart from the gap-2 behaviour? Is its growth exponential or slower?
 * **Decide possible against visited.** Section 4 found that the runs visit far fewer rows than are possible at look-back 96. Does the possible set shrink to the visited one as the look-back grows, or do the rare rows stay possible? If cells 1 to 4 are ever forced to `1110`, at what look-back?
-* **Check a prediction.** If the long-run language has positive but small entropy, the gap in the README's table should grow linearly with a small slope rather than logarithmically. Widths to 56 cannot tell these apart.
+* **Check a prediction.** If the long-run language has positive but small entropy, the gap in the README's table should grow linearly with a small slope rather than logarithmically. Widths to 82 cannot tell these apart (the gap is 10 to 15 from width 57 to 82).
 * **Check whether any of this is known.** I have not searched for it.
 
 ## Reproduce
@@ -177,6 +188,14 @@ python3 -m venv .venv && .venv/bin/pip install python-sat numpy
 
 ```bash
 cd src/p2 && ../../.venv/bin/python rightsim.py 1 900 40       # seed, double steps, runs: gap sequences from random right halves
+```
+
+```bash
+cd src/p2 && python3 megacheck.py 0 100000                      # right half as bits (0 = empty), depth: forced left half and its zero runs
+```
+
+```bash
+cd src/p2 && python3 megabatch.py 10 2000 3                     # right width, depth, processes: every right half up to that width
 ```
 
 ```bash

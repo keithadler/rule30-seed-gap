@@ -1,0 +1,6 @@
+right halves of width <= 16: 65536 x 2 phases, depth 10000
+smallest 'last one' over all of them: 9986
+longest zero run: 27 after depth 8300 (R=1111100010100, cell 1 last; ph=1)
+longest run starting at a depth with d digits: 1:8 2:17 3:25 4:27
+run histogram: 0:328243678 1:163190415 2:82336924 3:40584498 4:20793056 5:10091424 6:5258911 7:2528650 8:1264246 9:621078 10:313878 11:152022 12:76914 13:38278 14:20760 15:9740 16:5806 17:2252 18:1322 19:594 20:346 21:146 22:62 23:55 24:21 25:17 26:15 27:4
+python3 megabatch.py 16 10000 3  3842.76s user 19.60s system 274% cpu 23:26.76 total
