@@ -62,6 +62,7 @@ PYTHONPATH=src .venv/bin/python src/mint.py 2 8 19 29   # prints the horizon H(w
 `src/sat_period.py` encodes "some nonzero seed in `[-A, A]` has a center column with period `p` on times `t0 .. T`" as CNF, keeping only cells that can reach the center by time `T`. `src/mint.py` searches for the first `T` that is UNSAT. Run directly, `sat_period.py` also checks every SAT answer by simulating the seed it finds. On a laptop, `w = 29` takes about a second, `w = 45` about 20 seconds and `w = 82` about 3.6 hours; widths 83 to 86 had not finished after three hours each. The solver's UNSAT answers are not independently certified (no DRAT/LRAT proof is written).
 `src/gapscan_rules.c` is the `gapscan.c` search for the other left-permutive rules (set the environment variable `RULEG` to the 4-bit table of `g(c,r)`; the default 14 is Rule 30).
 Lean: `cd lean && lake build` (Lean 4.36.0, core only, no Mathlib). This also builds `Period2.lean` and `Repeat.lean`.
+Second kernel: [Tenet](https://github.com/keithadler/tenet), an independent Lean kernel in C# (commit `985ab13`), re-checked the four compiled files and everything they import with `tenet check .lake/build/lib/lean/Repeat.olean --all` (and the same for the other three): about 65,000 declarations in 672 modules each time, 0 failed. `tenet axioms` reports the same axioms as Lean for each main theorem. Tenet is by the same author as this repo, so it is a second implementation, not a second party.
 
 ## Period 2: an attempt at a proof
 
