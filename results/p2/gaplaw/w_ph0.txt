@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/keith/Documents/GitHub/rule30/p2/rightlang_w.py", line 5, in <module>
-    N, ph, W = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
-               ~~~^^^^^^^^^^^^^
-ValueError: invalid literal for int() with base 10: '22 30'
